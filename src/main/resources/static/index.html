@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Lost & Found</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #4facfe;
+            --secondary: #00f2fe;
+            --dark: #2d3436;
+            --bg-color: #4facfe;
+            --bg-gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #2d3436;
+            --shadow-color: rgba(0,0,0,0.2);
+            --input-bg: #fff;
+            --input-border: #ddd;
+            --input-text: #000;
+        }
+
+        body.admin-mode {
+            --primary: #8b5cf6;
+            --secondary: #6d28d9;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1e3f 100%);
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --text-main: #f8fafc;
+            --shadow-color: rgba(139, 92, 246, 0.4);
+            --input-bg: #334155;
+            --input-border: #475569;
+            --input-text: #fff;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            width: 380px;
+            text-align: center;
+            transition: all 0.5s ease;
+            color: var(--text-main);
+        }
+
+        .role-switcher {
+            display: flex;
+            background: rgba(0,0,0,0.05);
+            border-radius: 25px;
+            margin-bottom: 25px;
+            padding: 5px;
+        }
+
+        body.admin-mode .role-switcher {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 20px;
+            font-weight: bold;
+            color: var(--text-main);
+            transition: 0.3s;
+        }
+
+        .role-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        h2 { color: var(--text-main); margin-bottom: 10px; transition: color 0.5s ease; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: var(--input-bg);
+            color: var(--input-text);
+            transition: all 0.3s ease;
+        }
+
+        button.submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        button.submit-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        .hidden { display: none; }
+        
+        #otpBtn {
+            background: #2ecc71;
+            margin-bottom: 10px;
+        }
+
+        /* Admin Specific Styling */
+        #adminForm p {
+            color: #a78bfa;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        #adminForm .submit-btn {
+            background: #8b5cf6;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        #adminForm input:focus {
+            border-color: #8b5cf6;
+            outline: none;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>🔍 Portal Login</h2>
+        
+        <div class="role-switcher">
+            <button class="role-btn active" id="userTab" onclick="switchRole('USER')">User</button>
+            <button class="role-btn" id="adminTab" onclick="switchRole('ADMIN')">Admin</button>
+        </div>
+
+        <div id="userForm">
+            <p>Login via OTP</p>
+            <input type="email" id="userEmail" placeholder="Enter Registered Email">
+            <button type="button" class="submit-btn" id="otpBtn" onclick="sendOTP()">Send OTP</button>
+            <div id="otpSection" class="hidden">
+                <input type="text" id="otpInput" placeholder="Enter 6-Digit OTP">
+                <button type="button" class="submit-btn" onclick="verifyOTP()">Verify & Login</button>
+            </div>
+        </div>
+
+        <div id="adminForm" class="hidden">
+            <p>🔒 Control Panel Access</p>
+            <form id="adminLoginForm">
+                <input type="email" id="adminEmail" placeholder="Admin Email" required>
+                <input type="password" id="adminPassword" placeholder="Password" required>
+                <button type="submit" class="submit-btn">Login to Control Panel</button>
+            </form>
+        </div>
+
+        <p id="errorMsg" style="color: red; display: none; margin-top: 10px;"></p>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

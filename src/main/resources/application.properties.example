@@ -1,0 +1,18 @@
+# Environment & Database Configuration Template
+SERVER_PORT=8082
+DB_URL=jdbc:oracle:thin:@localhost:1522/xepdb1
+DB_USERNAME=your_db_username
+DB_PASSWORD=your_db_password
+
+# Email Service Configuration (Gmail App Password)
+SPRING_MAIL_HOST=smtp.gmail.com
+SPRING_MAIL_PORT=587
+SPRING_MAIL_USERNAME=your_email@gmail.com
+SPRING_MAIL_PASSWORD=your_16_digit_app_password
+
+# Admin Credentials
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your_secure_admin_password
+
+# JWT Authentication Secret
+JWT_SECRET=your_custom_long_and_secure_jwt_secret_key_here

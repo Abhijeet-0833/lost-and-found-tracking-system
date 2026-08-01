@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Campus Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --bg-start: #0f172a;
+            --bg-end: #1e1e3f;
+            --surface: rgba(30, 41, 59, 0.7);
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --text-dark: #f8fafc;
+            --text-gray: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 10px 30px rgba(0,0,0,0.2);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+        }
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.2); transform: scale(1); }
+            50% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.6); transform: scale(1.05); }
+            100% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.2); transform: scale(1); }
+        }
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes modalReveal {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0 20px 20px 20px;
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            padding: 20px 30px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border: 1px solid var(--border);
+            animation: slideInDown 0.6s ease-out forwards;
+        }
+        .header h1 {
+            margin: 0;
+            color: #a78bfa;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.3s ease;
+        }
+        .header h1:hover {
+            transform: scale(1.02);
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+        }
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid transparent;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+        }
+        .logout-btn:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            transform: translateY(-2px);
+        }
+        .container {
+            display: flex;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .form-section {
+            flex: 1;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            animation: fadeInUp 0.6s ease-out 0.2s forwards;
+            opacity: 0;
+        }
+        .feed-section {
+            flex: 2;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            animation: fadeInUp 0.6s ease-out 0.4s forwards;
+            opacity: 0;
+        }
+        .form-section h2, .feed-section h2 {
+            margin-top: 0;
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            background: linear-gradient(to right, #a78bfa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+        .form-section h2::after, .feed-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        .form-section:hover h2::after, .feed-section:hover h2::after {
+            width: 100px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .form-group:hover {
+            transform: translateX(5px);
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            box-sizing: border-box;
+            background: #334155;
+            color: white;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+            background: rgba(51, 65, 85, 0.9);
+            transform: scale(1.02);
+        }
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%) scale(0) rotate(45deg);
+            transition: transform 0.6s ease;
+        }
+        .submit-btn:hover::after {
+            transform: translate(-50%, -50%) scale(1) rotate(45deg);
+        }
+        .submit-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        }
+        .card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.2);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+        }
+        .card.lost::before { background: var(--warning); }
+        .card.found::before { background: var(--success); }
+
+        .card h3 {
+            margin: 0 0 5px 0;
+            color: var(--text-dark);
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .card p {
+            margin: 0;
+            color: var(--text-gray);
+            font-size: 0.95rem;
+        }
+        .card p strong { color: var(--text-dark); }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            width: fit-content;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .status-PENDING { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+        .status-APPROVED { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid #3b82f6; }
+        .status-SOLVED { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
+        .status-REJECTED { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        
+        .btn-run-match {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            width: max-content !important;
+            min-width: max-content;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-run-match:hover { background: var(--warning); color: white; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🔍 Campus Tracker Dashboard</h1>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <button id="adminPanelBtn" class="hidden" style="display:none; background:#8b5cf6; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold; white-space:nowrap;">⚙️ Control Panel</button>
+            <button id="notificationBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer; position:relative; white-space:nowrap;">
+                🔔 <span id="notifCount" style="position:absolute; top:-5px; right:-10px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:0.8rem; display:none;">0</span>
+            </button>
+            <button id="inboxBtn" style="background:#3b82f6; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold; white-space:nowrap;">💬 Inbox</button>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+    </div>
+
+    <!-- Notifications Dropdown -->
+    <div id="notificationDropdown" style="display:none; position:absolute; right:150px; top:80px; background:rgba(30,41,59,0.95); backdrop-filter:blur(20px); border:1px solid var(--border); padding:20px; width:350px; z-index:1000; border-radius:16px; box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+        <h4 style="margin:0 0 15px 0; color:var(--text-dark); border-bottom:1px solid var(--border); padding-bottom:10px;">Notifications</h4>
+        <div id="notifList" style="max-height:300px; overflow-y:auto; font-size:0.9rem; color:var(--text-gray);">No new notifications.</div>
+    </div>
+
+    <!-- Inbox Modal -->
+    <div id="inboxModal" style="display:none; position:fixed; top:5%; left:15%; width:70%; height:90%; background:rgba(15,23,42,0.95); backdrop-filter:blur(20px); z-index:2000; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.5); border:1px solid var(--border); flex-direction:column; color:var(--text-dark); overflow:hidden;">
+        <div style="padding:20px 30px; background:rgba(30,41,59,0.5); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.5rem; color:var(--primary); text-shadow:0 0 10px rgba(139,92,246,0.3);">💬 Your Approved Chats</h3>
+            <button id="closeInbox" style="cursor:pointer; background:rgba(239, 68, 68, 0.1); border:none; width:40px; height:40px; border-radius:50%; font-size:1.5rem; color:var(--danger); display:flex; align-items:center; justify-content:center; transition:background 0.2s;">&times;</button>
+        </div>
+        <div style="display:flex; flex:1; overflow:hidden;">
+            <div id="chatList" style="width:35%; border-right:1px solid var(--border); padding:20px; overflow-y:auto; background:rgba(30,41,59,0.3);">
+                <!-- Chat matches list -->
+            </div>
+            <div id="chatWindow" style="width:65%; display:flex; flex-direction:column; padding:20px; background:transparent;">
+                <div id="chatMessages" style="flex:1; overflow-y:auto; padding:20px; margin-bottom:15px; border-radius:12px; background:rgba(15,23,42,0.5); display:flex; flex-direction:column; gap:12px; border:1px solid var(--border);">
+                    <p style="text-align:center; color:var(--text-gray); margin-top:40px; font-weight:500;">Select a match from the left menu to start chatting.</p>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button id="shareLocationBtn" style="padding:15px 20px; background:var(--warning); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:bold; transition:all 0.3s; display:none;" title="Share Live Location">📍 Location</button>
+                    <input type="text" id="chatInput" placeholder="Type a message..." style="flex:1; padding:15px; border:1px solid #475569; border-radius:12px; font-size:1rem; outline:none; transition:all 0.3s; background:#334155; color:white;" disabled>
+                    <button id="sendBtn" style="padding:15px 30px; background:var(--primary); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:bold; transition:all 0.3s;" disabled>Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Form to Report an Item -->
+        <div class="form-section">
+            <h2>Report an Item</h2>
+            <form id="itemForm">
+                <div class="form-group">
+                    <label for="title">Item Title</label>
+                    <input type="text" id="title" placeholder="E.g., Blue Backpack" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="3" placeholder="Provide details..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" required>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Accessories">Accessories</option>
+                        <option value="Books">Books</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="itemType">Type</label>
+                    <select id="itemType" required>
+                        <option value="Lost">Lost</option>
+                        <option value="Found">Found</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="E.g., Library" required>
+                </div>
+                <div class="form-group">
+                    <label for="photo">Upload Photo</label>
+                    <input type="file" id="photo" accept="image/*">
+                </div>
+                <button type="submit" class="submit-btn">Submit Report</button>
+            </form>
+        </div>
+
+        <!-- Feed showing reported items -->
+        <div class="feed-section">
+            <h2>Recent Reports</h2>
+            <div id="itemFeed">
+                <!-- Items will be populated here by script.js -->
+                <p>Loading items...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Security check to ensure user is logged in
+        if (!localStorage.getItem("token")) {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
