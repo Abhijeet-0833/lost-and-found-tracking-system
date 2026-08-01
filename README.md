@@ -1,4 +1,4 @@
-# 🔍 Campus Lost & Found System
+# 🔍 Campus Lost and Found System
 
 A modern Spring Boot & Vanilla JS web application designed for campus communities to report, search, match, and claim lost and found items efficiently.
 
