@@ -23,7 +23,12 @@ public class NotificationController {
     }
 
     @PutMapping("/{id}/read")
-    public void markAsRead(@PathVariable Long id) {
-        notificationService.markAsRead(id);
+    public org.springframework.http.ResponseEntity<?> markAsRead(@PathVariable Long id, Authentication authentication) {
+        User currentUser = (User) authentication.getPrincipal();
+        boolean success = notificationService.markAsRead(id, currentUser.getUserId());
+        if (success) {
+            return org.springframework.http.ResponseEntity.ok().build();
+        }
+        return org.springframework.http.ResponseEntity.status(403).body("Unauthorized to mark this notification as read.");
     }
 }

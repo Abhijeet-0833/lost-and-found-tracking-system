@@ -1,6 +1,16 @@
 const API_URL = "http://localhost:8082/api/admin";
 const token = localStorage.getItem("token");
 
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 if (!token || localStorage.getItem("role") !== "ADMIN") {
     window.location.href = "index.html";
 }

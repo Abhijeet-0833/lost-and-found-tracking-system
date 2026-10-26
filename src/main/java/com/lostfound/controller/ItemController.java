@@ -57,22 +57,25 @@ public class ItemController {
         // Handle photo upload
         if (photo != null && !photo.isEmpty()) {
             try {
+                String originalFilename = photo.getOriginalFilename();
+                String ext = "";
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    ext = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+                }
+                if (!java.util.List.of(".jpg", ".jpeg", ".png", ".webp").contains(ext)) {
+                    return ResponseEntity.badRequest().body("Invalid photo format. Only JPG, PNG, and WebP images are allowed.");
+                }
+
                 String uploadsDir = "uploads/";
                 java.io.File dir = new java.io.File(uploadsDir);
                 if (!dir.exists()) {
                     dir.mkdirs();
                 }
-                String originalFilename = photo.getOriginalFilename();
-                // Replace spaces and special chars in filename just in case
-                if (originalFilename != null) {
-                    originalFilename = originalFilename.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
-                }
-                String filename = System.currentTimeMillis() + "_" + originalFilename;
+                String filename = System.currentTimeMillis() + "_" + java.util.UUID.randomUUID().toString() + ext;
                 java.io.File serverFile = new java.io.File(dir.getAbsolutePath() + java.io.File.separator + filename);
                 photo.transferTo(serverFile);
                 item.setPhotoUrl("/uploads/" + filename);
             } catch (Exception e) {
-                e.printStackTrace();
                 return ResponseEntity.internalServerError().body("Failed to upload photo");
             }
         }
@@ -133,11 +136,17 @@ public class ItemController {
         }
     }
     @PutMapping("/{id}/status")
-public ResponseEntity<Item> updateStatus(@PathVariable Long id, @RequestParam String status) {
-    return itemRepository.findById(id).map(item -> {
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status, Authentication authentication) {
+        User currentUser = (User) authentication.getPrincipal();
+        Item item = itemRepository.findById(id).orElse(null);
+        if (item == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (!"ADMIN".equals(currentUser.getRole()) && !item.getReportedBy().equals(currentUser.getUserId())) {
+            return ResponseEntity.status(403).body("Unauthorized: You can only update the status of your own items.");
+        }
         item.setStatus(status);
         return ResponseEntity.ok(itemRepository.save(item));
-    }).orElse(ResponseEntity.notFound().build());
-}
+    }
 
 }

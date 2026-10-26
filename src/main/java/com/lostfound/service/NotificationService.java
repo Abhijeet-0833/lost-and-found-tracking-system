@@ -23,10 +23,14 @@ public class NotificationService {
         return notificationRepository.findByUserIdAndIsReadFalse(userId);
     }
 
-    public void markAsRead(Long notificationId) {
-        notificationRepository.findById(notificationId).ifPresent(n -> {
-            n.setRead(true);
-            notificationRepository.save(n);
-        });
+    public boolean markAsRead(Long notificationId, Long userId) {
+        return notificationRepository.findById(notificationId).map(n -> {
+            if (n.getUserId() != null && n.getUserId().equals(userId)) {
+                n.setRead(true);
+                notificationRepository.save(n);
+                return true;
+            }
+            return false;
+        }).orElse(false);
     }
 }

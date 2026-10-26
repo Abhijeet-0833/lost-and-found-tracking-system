@@ -1,5 +1,15 @@
 const API_URL = "http://localhost:8082/api/items";
 
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 // 1. Load Items on Page Load
 document.addEventListener("DOMContentLoaded", fetchItems);
 
@@ -36,14 +46,14 @@ function displayItems(items) {
     }
     
     feed.innerHTML = items.map(item => `
-        <div class="card ${item.itemType.toLowerCase()}">
-            <h3>${item.title}</h3>
-            ${item.photoUrl ? `<img src="http://localhost:8082${item.photoUrl}" style="width:100%; border-radius:10px; margin-top:10px; margin-bottom:10px; max-height: 250px; object-fit: cover;" alt="Item Photo">` : ''}
-            <p><strong>Type:</strong> ${item.itemType}</p>
-            <p>${item.description}</p>
-            <p>📍 ${item.location}</p>
+        <div class="card ${escapeHtml(item.itemType ? item.itemType.toLowerCase() : '')}">
+            <h3>${escapeHtml(item.title)}</h3>
+            ${item.photoUrl ? `<img src="http://localhost:8082${encodeURI(item.photoUrl)}" style="width:100%; border-radius:10px; margin-top:10px; margin-bottom:10px; max-height: 250px; object-fit: cover;" alt="Item Photo">` : ''}
+            <p><strong>Type:</strong> ${escapeHtml(item.itemType)}</p>
+            <p>${escapeHtml(item.description)}</p>
+            <p>📍 ${escapeHtml(item.location)}</p>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; padding-top:10px; border-top:1px solid #f3f4f6;">
-                <span class="status status-${item.status || "PENDING"}">${item.status || "PENDING"}</span>
+                <span class="status status-${escapeHtml(item.status || "PENDING")}">${escapeHtml(item.status || "PENDING")}</span>
                 <button onclick="runMatching(${item.itemId})" class="btn-run-match">Run Matching</button>
             </div>
         </div>
@@ -250,8 +260,8 @@ async function loadMessages() {
             msgs.map(m => {
                 const isMe = true; // We can improve this if we save userId in localStorage
                 return `<div style="padding:12px 18px; margin-bottom:8px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.05); border-radius:12px; box-shadow:0 2px 5px rgba(0,0,0,0.2); width:fit-content; max-width:80%;">
-                    <div style="font-size:0.75rem; color:var(--primary); margin-bottom:4px; font-weight:bold; text-transform:uppercase;">User ${m.senderId}</div>
-                    <div style="color:var(--text-dark); line-height:1.4;">${m.content}</div>
+                    <div style="font-size:0.75rem; color:var(--primary); margin-bottom:4px; font-weight:bold; text-transform:uppercase;">User ${escapeHtml(m.senderId)}</div>
+                    <div style="color:var(--text-dark); line-height:1.4;">${escapeHtml(m.content)}</div>
                 </div>`;
             }).join('');
     }

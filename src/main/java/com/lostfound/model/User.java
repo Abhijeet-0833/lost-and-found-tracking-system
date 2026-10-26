@@ -1,5 +1,6 @@
 package com.lostfound.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,7 +14,12 @@ public class User {
 
     private String username;
     private String email;
+
+    @JsonIgnore
     private String password;
+
     private String role;
+
+    @JsonIgnore
     private String otpCode;
 }
