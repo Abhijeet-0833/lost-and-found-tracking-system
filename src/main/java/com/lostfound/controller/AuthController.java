@@ -17,7 +17,7 @@ public class AuthController {
     @Value("${admin.email:admin@example.com}")
     private String adminEmail;
 
-    @Value("${admin.password:admin123}")
+    @Value("${admin.password:}")
     private String adminPassword;
 
     @Autowired
@@ -45,8 +45,10 @@ public class AuthController {
         String email = request.get("email");
         String password = request.get("password");
 
-        // Simple check for now - replace with actual DB password check
-        if (adminEmail.equalsIgnoreCase(email) && adminPassword.equals(password)) {
+        // Admin login is disabled unless an administrator password is configured.
+        if (adminPassword != null && !adminPassword.isBlank()
+                && email != null && password != null
+                && adminEmail.equalsIgnoreCase(email) && adminPassword.equals(password)) {
 
             // Ensure admin exists in DB with ADMIN role
             com.lostfound.model.User admin = userRepository.findByEmail(email).orElseGet(() -> {
